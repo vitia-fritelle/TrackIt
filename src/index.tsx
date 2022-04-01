@@ -5,6 +5,7 @@ import styled from 'styled-components';
 
 const GeneralStyles = styled.div`
     font-family: 'Lexend Deca', sans-serif;
+    background-color: #FFFFFF;
 `;
 
 ReactDOM.render(
