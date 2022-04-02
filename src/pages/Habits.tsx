@@ -1,8 +1,15 @@
+import Footer from "../components/Footer";
+import Header from "../components/Header";
+
 
 export default () => {
     return (
-        <div>
-            Hábitos
-        </div>
+        <>
+            <Header/>
+            <div>
+                Hábitos
+            </div>
+            <Footer/>
+        </>
     );
 }

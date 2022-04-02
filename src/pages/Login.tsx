@@ -6,7 +6,10 @@ import { ThreeDots } from 'react-loader-spinner';
 
 import logo from '../assets/images/logo.png';
 
-export default () => {
+export default ({setName, setImage}: {
+    setName: (name: string) => void,
+    setImage: (name: string) => void
+}) => {
 
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
@@ -32,9 +35,10 @@ export default () => {
             email,
             password
         });
-        response.then((response) => {
+        response.then(({data}) => {
             setDisabled(false);
-            console.log(response);
+            setImage(data.image);
+            setName(data.name);
             browse('/hoje');
         });
         response.catch(() => {
