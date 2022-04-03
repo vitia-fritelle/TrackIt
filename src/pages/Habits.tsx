@@ -6,7 +6,6 @@ import Header from "../components/Header";
 import UserContext from "../contexts/UserContext";
 import { TrashBinOutline } from 'react-ionicons';
 
-
 type Habit = {
     id: number,
     name: string,
@@ -19,20 +18,33 @@ export default () => {
 
     const {token} = useContext(UserContext);
 
-    useEffect(() => {
-        (async () => {
-            const config = {
-                headers: {
-                  'Authorization': `Bearer ${token}`
-                }
-            }
-            const URL = 'https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits'
-            const {data: newHabits} = await axios.get(URL,config);
-            setHabits(newHabits);
-        })();
-    });
-
     const weekDays = ['D','S','T','Q','Q','S','S'];
+    
+    const config = {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+    }
+
+    const getHabits = async () => {
+        const URL = 'https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits';
+        const {data: newHabits} = await axios.get(URL,config);
+        setHabits(newHabits);
+    }
+
+    const deleteHabit = async (id: number) => {
+        const answer = window.confirm('Você realmente gostaria de apagar esse hábito?');
+        
+        if(answer) {
+            const URL = `https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits/${id}`;
+            await axios.delete(URL,config);
+            await getHabits();
+        }
+    }
+    
+    useEffect(() => {
+        getHabits();
+    });
 
     return (
         <>
@@ -40,7 +52,7 @@ export default () => {
             <Main>
                 <div>
                     Meus hábitos
-                    <button>+</button>
+                    <button onClick = {() => {}}>+</button>
                 </div>
                 <ul>
                     {habits.length === 0?
@@ -56,7 +68,7 @@ export default () => {
                             )}
                         </ul>
                         <TrashBinOutline cssClasses={'delete-button'}
-                                         onClick={() => {}}/>
+                                         onClick={() => deleteHabit(id)}/>
                     </li>)}            
                 </ul>
             </Main>
