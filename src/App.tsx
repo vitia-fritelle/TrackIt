@@ -11,14 +11,17 @@ export default () => {
     const [image, setImage] = useState<string>('');
     const [name, setName] = useState<string>('');
     const [progress, setProgress] = useState<number>(0);
+    const [token, setToken] = useState<string>('');
 
     return (
-        <UserContext.Provider value={{image,name, progress, setProgress}}> 
+        <UserContext.Provider value={{image, name, progress, setProgress, token}}> 
             <BrowserRouter>
                 <Routes>
                     <Route path='/' 
                         element={
-                                <Login setImage={setImage} setName={setName}/>
+                                <Login setName={setName}
+                                       setImage={setImage}  
+                                       setToken={setToken}/>
                         }/>
                     <Route path='/cadastro' element={<SignUp/>}/>
                     <Route path='/habitos' element={<Habits/>}/>
