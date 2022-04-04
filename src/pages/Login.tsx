@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import styled from 'styled-components';
@@ -41,6 +41,7 @@ export default ({setName, setImage, setToken}: {
             setImage(data.image);
             setName(data.name);
             setToken(data.token);
+            localStorage.setItem('user',JSON.stringify(data));
             browse('/hoje');
         });
         response.catch(() => {
@@ -48,6 +49,17 @@ export default ({setName, setImage, setToken}: {
             alert('Algo não deu certo :(');
         });
     };
+
+    useEffect(() => {
+        const user = localStorage.getItem('user');
+        if(user !== null) {
+            const data = JSON.parse(user);
+            setImage(data.image);
+            setName(data.name);
+            setToken(data.token);
+            browse('/hoje');
+        }
+    })
 
     return (
         <Container>
