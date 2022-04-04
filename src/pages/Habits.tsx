@@ -44,80 +44,6 @@ export default () => {
         getHabits();
     });
 
-    const AddHabit = () => {
-
-        const [loading, setLoading] = useState<boolean>(false);
-
-        const clear = () => {
-            setDays([]);
-            setName('');
-        }
-        
-        const close = () => setAddingHabit(false);
-
-        const addHabit = (e: React.FormEvent<HTMLFormElement>) => {
-            e.preventDefault();
-            setLoading(true);
-            const data = {
-                name, 
-                days
-            }
-            const URL = '';
-            const response = habitAxios.post(URL, data);
-            response.then(() => {
-                clear();
-                setLoading(false);
-                close();
-            });
-            response.catch((error) => {
-                setLoading(false);
-                alert(error.message);
-            });
-            
-        }
-    
-        const action = (e: React.MouseEvent<HTMLLIElement, MouseEvent>, id: number) => {
-            const day = e.currentTarget;
-            day.classList.toggle('marked');
-            if(day.classList.contains('marked')){
-                setDays([...days, id]);
-            } else {
-                setDays(days.filter((element: number) => element !== id));
-            }
-        }
-        
-        return (
-            <Form onSubmit={addHabit}>
-                <input type="text" 
-                       value={name} 
-                       placeholder="nome do hábito"
-                       onChange={(e) => setName(e.target.value)}
-                       disabled={loading} />
-                <ul>
-                    {weekDays.map((day, index) => 
-                        <li className={typeof days.find((element: number) => element === index) !== 'undefined'
-                                       ?'marked'
-                                       :''}
-                            key={index} 
-                            onClick={(e) => !loading && action(e, index)}>
-                            {day}
-                        </li>
-                    )}
-                </ul>
-                <div>
-                    <button onClick={close}>Cancelar</button>
-                    <button type="submit" disabled={loading}>
-                        {loading
-                         ? <ThreeDots color="#FFFFFF" 
-                                      height={45} 
-                                      width={45} />
-                         :'Salvar'}
-                    </button>
-                </div>
-            </Form>
-        );
-    }
-
     return (
         <>
             <Header/>
@@ -128,7 +54,12 @@ export default () => {
                         +
                     </button>
                 </header>
-                {addingHabit?<AddHabit/>:''}
+                {addingHabit?<AddHabit name={name}
+                                       days={days}
+                                       setName={setName}
+                                       setDays={setDays}
+                                       close={() => setAddingHabit(false)}
+                                       habitAxios={habitAxios}/>:''}
                 <ul>
                     {habits.length === 0
                     ?'Você não tem nenhum hábito cadastrado ainda. '
@@ -150,6 +81,78 @@ export default () => {
             </Main>
             <Footer/>
         </>
+    );
+}
+
+const AddHabit = (props: any) => {
+
+    const [loading, setLoading] = useState<boolean>(false);
+
+    const clear = () => {
+        props.setDays([]);
+        props.setName('');
+    }
+    
+    const addHabit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setLoading(true);
+        const data = {
+            name: props.name, 
+            days: props.days
+        }
+        const URL = '';
+        const response = props.habitAxios.post(URL, data);
+        response.then(() => {
+            clear();
+            setLoading(false);
+            props.close();
+        });
+        response.catch((error: { message: any }) => {
+            setLoading(false);
+            alert(error.message);
+        });
+        
+    }
+    
+    const action = (e: React.MouseEvent<HTMLLIElement, MouseEvent>, id: number) => {
+        const day = e.currentTarget;
+        day.classList.toggle('marked');
+        if(day.classList.contains('marked')){
+            props.setDays([...props.days, id]);
+        } else {
+            props.setDays(props.days.filter((element: number) => element !== id));
+        }
+    }
+    
+    return (
+        <Form onSubmit={addHabit}>
+            <input type="text" 
+                   value={props.name} 
+                   placeholder="nome do hábito"
+                   onChange={(e) => props.setName(e.target.value)}
+                   disabled={loading} />
+            <ul>
+                {weekDays.map((day, index) => 
+                    <li className={typeof props.days.find((element: number) => element === index) !== 'undefined'
+                                   ?'marked'
+                                   :''}
+                        key={index} 
+                        onClick={(e) => !loading && action(e, index)}>
+                        {day}
+                    </li>
+                )}
+            </ul>
+            <div>
+                <button onClick={props.close}>Cancelar</button>
+                <button type="submit" disabled={loading}>
+                    {loading
+                     ? <ThreeDots color="#FFFFFF" 
+                                  height={45} 
+                                  width={45} />
+                     :'Salvar'}
+                </button>
+            </div>
+        </Form>
     );
 }
 
@@ -218,6 +221,8 @@ const Main = styled.main`
             width: 100%;
 
             position: relative;
+
+            margin-bottom: 10px;
 
             .delete-button {
                 position: absolute;
