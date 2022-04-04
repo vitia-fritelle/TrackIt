@@ -2,44 +2,68 @@ import axios from "axios";
 import { useContext, useEffect, useState } from "react";
 import { Checkbox } from "react-ionicons";
 import styled from "styled-components";
+import dayjs from 'dayjs';
+import 'dayjs/locale/pt-br';
 import Footer from "../components/Footer";
 import Header from "../components/Header";
 import UserContext from "../contexts/UserContext";
+import { TodayHabit } from "../types";
 
-type TodayHabit = {
-    id: number,
-    name: string,
-    done: boolean,
-    currentSequence: number,
-    highestSequence: number
-}
-
+const weekDays = [
+    'Domingo',
+    'Segunda',
+    'Terça',
+    'Quarta',
+    'Quinta',
+    'Sexta',
+    'Sábado'
+];
 
 export default () => {
     const [habits, setHabits] = useState<Array<TodayHabit>>([]);
 
-    const {token} = useContext(UserContext);
+    const {token, progress, setProgress} = useContext(UserContext);
 
-    const config = {
-        headers: {
-            'Authorization': `Bearer ${token}`
-        }
-    }
+    const todayAxios = axios.create({
+        baseURL: 'https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits',
+        headers: {'Authorization': `Bearer ${token}`}
+    }) 
 
     useEffect(() => {
         (async () => {
-            const URL = 'https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits/today';
-            const {data} = await axios.get(URL,config);
+            const URL = '/today';
+            const {data}:{
+                data: Array<TodayHabit>
+            } = await todayAxios.get(URL);
             setHabits(data);
+            setProgress(data.filter(({done}) => done).length/data.length*100);
         })();
     });
+
+    const checkHabit = (id: number) => {
+        const URL = `/${id}/check`
+        todayAxios.post(URL);
+    }
+
+    const unCheckHabit = (id: number) => {
+        const URL = `/${id}/uncheck`
+        todayAxios.post(URL);
+    }
+
     return (
         <>
             <Header/>
             <Main>
                 <header>
-                    <h2>Segunda, 17/05</h2>
-                    <h4>Nenhum hábito concluído ainda</h4>
+                    <h2>
+                        {`${weekDays[dayjs().day()]}, `}
+                        {`${dayjs().format('DD/MM')}`}
+                    </h2>
+                    <h4 className={progress > 0?'green':''}>
+                        {progress === 0
+                         ?'Nenhum hábito concluído ainda'
+                         :`${progress.toFixed(0)}% dos hábitos concluídos`}
+                    </h4>
                 </header>
                 <ul>
                     {habits.map(({
@@ -48,12 +72,26 @@ export default () => {
                         <li key={id}>
                             <div className="title">
                                 <h3>{name}</h3>
-                                <h5>Sequência atual: {currentSequence} {currentSequence > 1?'dias':'dia'}</h5>
-                                <h5>Seu recorde: {highestSequence} {currentSequence > 1?'dias':'dia'}</h5>
+                                <h5 className={done?'green':''}>
+                                    Sequência atual: 
+                                    {` ${currentSequence}`} 
+                                    {currentSequence > 1?' dias':' dia'}
+                                </h5>
+                                <h5 className={done && currentSequence === highestSequence
+                                               ?'green'
+                                               :''}>
+                                    Seu recorde: 
+                                    {` ${highestSequence}`} 
+                                    {currentSequence > 1?' dias':' dia'}
+                                </h5>
                             </div>
                             <Checkbox color={done?'#8FC549':'#EBEBEB'} 
                                       height="69px"
-                                      width="69px"/>
+                                      width="69px"
+                                      style={{cursor: 'pointer'}}
+                                      onClick={() => done
+                                                     ?unCheckHabit(id)
+                                                     :checkHabit(id)}/>
                         </li>)}
                 </ul>
             </Main>
@@ -131,5 +169,9 @@ const Main = styled.main`
                 }
             }
         }
+    }
+
+    .green {
+        color: #8FC549;
     }
 `;

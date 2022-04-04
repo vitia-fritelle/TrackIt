@@ -3,3 +3,11 @@ export type Habit = {
     name: string,
     days: Array<number>
 }
+
+export type TodayHabit = {
+    id: number,
+    name: string,
+    done: boolean,
+    currentSequence: number,
+    highestSequence: number
+}
