@@ -11,3 +11,17 @@ export type TodayHabit = {
     currentSequence: number,
     highestSequence: number
 }
+
+export type HistoryHabit = {
+    id: number,
+    name: string,
+    date: string,
+    weekDay: number,
+    historyId: number,
+    done: boolean
+}
+
+export type Historyc = {
+    day: string,
+    habits: Array<HistoryHabit>
+}
