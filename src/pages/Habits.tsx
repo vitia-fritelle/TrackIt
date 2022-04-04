@@ -6,12 +6,7 @@ import styled from "styled-components";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
 import UserContext from "../contexts/UserContext";
-
-type Habit = {
-    id: number,
-    name: string,
-    days: Array<number>
-}
+import { Habit } from "../types";
 
 const weekDays = ['D','S','T','Q','Q','S','S'];
 
